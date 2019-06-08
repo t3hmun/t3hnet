@@ -1,4 +1,4 @@
-﻿namespace t3hnet
+﻿namespace t3hnet.Control
 {
     using System;
 
