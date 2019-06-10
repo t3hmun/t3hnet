@@ -1,6 +1,5 @@
 ﻿namespace t3hnet
 {
-    using System;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -21,9 +20,9 @@
         /// <param name="app"></param>
         public override void Configure(IApplicationBuilder app)
         {
-            app.ApplicationServices.GetService<IHostingEnvironment>();
+            var hostingEnvironment = app.ApplicationServices.GetService<IHostingEnvironment>();
+            app.UseStaticFiles();
             app.Run(async context => { await context.Response.WriteAsync("Salutations"); });
         }
-
     }
 }

@@ -8,4 +8,11 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <None Include="config\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

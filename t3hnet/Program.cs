@@ -24,15 +24,27 @@
         {
             IWebHostBuilder builder = new WebHostBuilder();
 
+
+
             // Load Configs.
             builder.UseConfiguration(new ConfigurationBuilder().AddJsonFile("config/hostConfig.json").Build());
-            builder.ConfigureAppConfiguration(configBuilder => { configBuilder.AddJsonFile("config/webConfig.json"); });
+            // AppConfiguration is layered on top of a copy of the hostConfig.
+            // The configs-delegates are run after the host config is built.
+            builder.ConfigureAppConfiguration(configBuilder => { configBuilder.AddJsonFile("config/webConfig.json"); }); 
+            
+            // ContentRoot: AppContext.BaseDirectory is the default (WebHostBuilder.BuildCommonServices() called by IWebHost.Build()).
+            builder.UseContentRoot(AppContext.BaseDirectory);
+            // WebRoot: wwwroot is the default (HostingEnvironmentExtensions.Initialize() called by WebHostBuilder.BuildCommonServices())
+            builder.UseWebRoot("wwwroot"); 
+
 
             // Register Services with IoC container.
-            builder.ConfigureServices(ConfigureCommanderServices());
-            builder.ConfigureServices(AddStartup()); //WebHost uses Startup to configure the pipeline during its initialisation.
-            builder.UseKestrel(); //This is just DI registrations of server stuff.
-
+            builder.ConfigureServices(ConfigureCommanderServices()); 
+            // WebHost calls the 2 methods of Startup to configure the pipeline during Start().
+            builder.ConfigureServices(AddStartup());
+            // The DI registration for IServer.
+            builder.UseKestrel(); 
+            
             return builder;
         }
 
