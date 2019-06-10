@@ -1,5 +1,6 @@
 ﻿namespace t3hnet
 {
+    using System;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -8,20 +9,21 @@
     /// <summary>Startup is a singleton service that is used to configure the pipeline and its services.</summary>
     /// <remarks> WebHost resolves Startup and then calls ConfigureServices during its initialisation, which is invoked by the
     ///     WebHostBuilder. Configure is called later when the WebHost is started.</remarks>
-    public class Startup
+    public class Startup : StartupBase
     {
         /// <summary>Called during WebHostBuilder.Build to register the services for the pipeline.</summary>
         /// <param name="services"></param>
-        public void ConfigureServices(IServiceCollection services)
+        public override void ConfigureServices(IServiceCollection services)
         {
         }
 
         /// <summary>Called during IWebHost.Start to build the pipeline.</summary>
         /// <param name="app"></param>
-        /// <param name="env"></param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public override void Configure(IApplicationBuilder app)
         {
+            app.ApplicationServices.GetService<IHostingEnvironment>();
             app.Run(async context => { await context.Response.WriteAsync("Salutations"); });
         }
+
     }
 }
