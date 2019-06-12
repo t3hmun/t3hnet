@@ -21,12 +21,12 @@
         {
             // Give all other middleware a chance to set a response.
             await _next(context);
+            // Now all the other middleware have run and had a change to set the response.
 
+            // If the end of the pipeline is reached the response is automatically changed to 404.
 
-            // An untouched response is null length, 0 length would be a valid empty reply.
-            if (context.Response.ContentLength == null)
+            if (!context.Response.HasStarted && context.Response.StatusCode == 404)
             {
-                context.Response.StatusCode = 404;
                 context.Response.ContentType = "text/html; charset=utf-8";
                 await context.Response.WriteAsync("nope");
             }

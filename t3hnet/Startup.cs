@@ -6,6 +6,7 @@
     using Microsoft.AspNetCore.StaticFiles;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
+    using t3hnet.Control;
     using t3hnet.ware;
 
     /// <summary>Startup is a singleton service that is used to configure the pipeline and its services.</summary>
@@ -24,12 +25,56 @@
         public override void Configure(IApplicationBuilder app)
         {
             var hostingEnvironment = app.ApplicationServices.GetService<IHostingEnvironment>();
+
+            app.Use(async (context, next) =>
+            {
+                var console = context.RequestServices.GetService<IServerCommandCommunication>();
+                var now = context.RequestServices.GetService<INow>();
+                var started = Info(context);
+                console.WriteLine($"{now.Time()} A Way Up  {started}");
+                await next();
+                started = Info(context);
+                console.WriteLine($"{now.Time()} A WayDown {started}");
+
+            });
             // The StaticFiles MiddleWare default to using the hostingEnvironment.WebRootFileProvider,
             // which is set up during WebHostEnvironmentExtensions.Initialize()<WebHost.BuildCommonServices()<WebHost.Build()
+            app.UseMiddleware<DefaultReplyMiddleware>();
+
+
+            app.Use(async (context, next) =>
+            {
+                var console = context.RequestServices.GetService<IServerCommandCommunication>();
+                var now = context.RequestServices.GetService<INow>();
+                var started = Info(context);
+                console.WriteLine($"{now.Time()} B Way Up  {started}");
+                await next();
+                started = Info(context);
+                console.WriteLine($"{now.Time()} B WayDown {started}");
+
+            });
+
+ 
             app.UseMiddleware<StaticFileMiddleware>(Options.Create(new StaticFileOptions
                 {FileProvider = hostingEnvironment.WebRootFileProvider}));
-            app.UseMiddleware<DefaultReplyMiddleware>();
-            //app.Run(async context => { await context.Response.WriteAsync("Salutations"); });
+
+            app.Use(async (context, next) =>
+            {
+                var console = context.RequestServices.GetService<IServerCommandCommunication>();
+                var now = context.RequestServices.GetService<INow>();
+                var started = Info(context);
+                console.WriteLine($"{now.Time()} C Way Up  {started}");
+                await next();
+                started = Info(context);
+                console.WriteLine($"{now.Time()} C WayDown {started}");
+
+            });
+
+        }
+
+        private static string Info(HttpContext context)
+        {
+            return $"{context.Response.HasStarted} {context.Response.StatusCode}";
         }
     }
 }
